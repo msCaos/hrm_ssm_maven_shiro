@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.DocumentDao">
+    
+
+    <resultMap id="DocumentMap" type="Document">
+        <id property="id" column="id"></id>
+        <result property="createDate" column="CREATE_DATE" javaType="java.util.Date"></result>
+        <association property="user" column="USER_ID"
+                     select="org.deepsl.hrm.dao.UserDao.selectById" javaType="dept"
+                     fetchType="eager">
+        </association>
+     </resultMap>
+
+    <sql id="selectByPageWhere">
+        <where>
+            <if test="document !=null and document.title!=null and ! document.title.isEmpty()">
+                title LIKE  #{document.title}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectByPage" parameterType="hashMap" resultMap="DocumentMap" >
+        select * from document_inf
+       <include refid="selectByPageWhere"></include>
+        <if test="pageModel !=null">
+            limit #{pageModel.firstLimitParam} , #{pageModel.pageSize}
+        </if>
+    </select>
+
+    <select id="count" parameterType="hashMap" resultType="int" >
+        select count(*) from document_inf
+        <include refid="selectByPageWhere"></include>
+    </select>
+
+
+</mapper>

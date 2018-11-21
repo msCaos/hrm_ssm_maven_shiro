@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.EmployeeDao">
+
+
+
+    <resultMap id="EmployeeMap" type="Employee">
+        <id property="id" column="id"></id>
+        <association property="dept" column="DEPT_ID" select="org.deepsl.hrm.dao.DeptDao.selectById" javaType="dept"></association>
+        <association property="job" column="JOB_ID" select="org.deepsl.hrm.dao.JobDao.selectById" javaType="job"></association>
+    </resultMap>
+
+    <select id="selectById" resultMap="EmployeeMap">
+         select * from employee_inf  where ID = #{id}
+    </select>
+
+
+
+    <sql id="pageQuery">
+        <where>
+            <if test="employee.dept != null and employee.dept.id !=null and employee.dept.id!=0">
+                AND DEPT_ID = #{employee.dept.id}
+            </if>
+            <if test="employee.job != null and employee.job.id !=null and employee.job.id!=0">
+                AND JOB_ID = #{employee.job.id}
+            </if>
+            <if test="employee.name != null and ! employee.name.isEmpty() ">
+                AND  `NAME` LIKE  #{employee.name}
+            </if>
+            <if test="employee.phone != null and ! employee.phone.isEmpty()">
+                AND phone LIKE  #{employee.phone}
+            </if>
+            <if test="employee.cardId != null and ! employee.cardId.isEmpty()">
+                AND card_id LIKE  #{employee.cardId}
+            </if>
+            <if test="employee.sex != null and employee.sex!=0 ">
+                AND sex = #{employee.sex}
+            </if>
+
+        </where>
+    </sql>
+    <select id="selectByPage" parameterType="hashMap" resultMap="EmployeeMap">
+        select * from employee_inf
+        <include refid="pageQuery"></include>
+        <if test="pageModel!=null">
+            limit #{pageModel.firstLimitParam} , #{pageModel.pageSize}
+        </if>
+    </select>
+
+    <select id="count" parameterType="hashMap" resultType="int">
+        select count(*) from employee_inf
+        <include refid="pageQuery"></include>
+
+    </select>
+</mapper>

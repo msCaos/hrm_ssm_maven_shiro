@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.deepsl.hrm.dao.NoticeDao">
+
+        <resultMap id="NoticeMap" type="Notice">
+            <id property="id" column="id"></id>
+            <result property="createDate" column="CREATE_DATE" javaType="java.util.Date"></result>
+            <association property="user" column="USER_ID"
+                         select="org.deepsl.hrm.dao.UserDao.selectById" javaType="dept"
+                         fetchType="eager">
+            </association>
+        </resultMap>
+
+        <sql id="selectByPageWhere">
+            <where>
+                <if test="notice !=null and notice.title!=null and ! notice.title.isEmpty()">
+                    title LIKE  #{notice.title}
+                </if>
+                <if test="notice !=null and notice.content!=null and ! notice.title.isEmpty()">
+                    title LIKE  #{notice.content}
+                </if>
+            </where>
+        </sql>
+
+        <select id="selectByPage" parameterType="hashMap" resultMap="NoticeMap" >
+            select * from notice_inf
+            <include refid="selectByPageWhere"></include>
+            <if test="pageModel !=null">
+                limit #{pageModel.firstLimitParam} , #{pageModel.pageSize}
+            </if>
+        </select>
+
+        <select id="count" parameterType="hashMap" resultType="int" >
+            select count(*) from notice_inf
+            <include refid="selectByPageWhere"></include>
+        </select>
+
+</mapper>
